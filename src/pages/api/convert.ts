@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { OpenAI } from 'openai';
 import fs from 'fs';
 import path from 'path';
-import { uploadAudioFile } from '@/utils/supabase';
+import { uploadAudioFile } from '@/utils/uploadAudioFile';
+import { convertTextToSpeech } from '@/utils/createAudio';
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,20 +10,14 @@ export default async function handler(
   ) {  if (req.method === 'POST') {
     const { text } = req.body;
     const now = new Date();
-    const speechFile = path.resolve('./speech' + now.getTime() + '.mp3');
-
+    const speechFile = './audios/speech' + now.getTime() + '.mp3'//path.resolve('./audios/speech' + now.getTime() + '.mp3');
+    //const filePath = crypto.randomUUID() + '-' + file.name
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
     }
 
     try {
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-      const response = await openai.audio.speech.create({
-        input: text,
-        model: "tts-1",
-        voice: 'alloy',
-      });
+      const response = await convertTextToSpeech(text)
       
       const buffer = Buffer.from(await response.arrayBuffer());
       
@@ -31,11 +25,13 @@ export default async function handler(
       await fs.promises.writeFile(speechFile, buffer);
       console.log('Finished streaming');
       
-      const audioUrl = await uploadAudioFile(speechFile)
+      const audioUrl = await uploadAudioFile(speechFile, buffer)
            
       if(!audioUrl){
-        return
+        res.status(500).json({ error: 'Error uploading audio file' });
+        return;
       }
+
       res.status(200).json({ audioUrl });
     } catch (error) {
       console.error('Error processing text:', error);

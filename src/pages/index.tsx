@@ -49,7 +49,7 @@ export default function Home() {
             Your browser does not support the audio element.
           </audio>
           <br />
-          <a href={audioUrl} download="audiobook.mp3" className="text-blue-500 hover:underline">
+          <a href={audioUrl} target='_blank' download={audioUrl} className="text-blue-500 hover:underline">
             Download Audio
           </a>
         </div>
