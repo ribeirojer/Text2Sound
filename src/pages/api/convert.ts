@@ -1,6 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
-import path from 'path';
 import { uploadAudioFile } from '@/utils/uploadAudioFile';
 import { convertTextToSpeech } from '@/utils/createAudio';
 
@@ -18,12 +16,17 @@ export default async function handler(
 
     try {
       const response = await convertTextToSpeech(text)
+
+      if (!response.ok) {
+        res.status(500).json({ error: 'Error converting text to speech' });
+        return;
+      }
       
       const buffer = Buffer.from(await response.arrayBuffer());
       
-      console.log(`Streaming response to ${speechFile}`);
-      await fs.promises.writeFile(speechFile, buffer);
-      console.log('Finished streaming');
+      //console.log(`Streaming response to ${speechFile}`);
+      //await fs.promises.writeFile(speechFile, buffer);
+      //console.log('Finished streaming');
       
       const audioUrl = await uploadAudioFile(speechFile, buffer)
            
