@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { uploadAudioFile } from '@/utils/uploadAudioFile';
-import { convertTextToSpeech } from '@/utils/createAudio';
+import { convertTextToSpeech, createWordTimings } from '@/utils/createAudio';
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,7 +9,7 @@ export default async function handler(
     const { text } = req.body;
     const now = new Date();
     const speechFile = './audios/speech' + now.getTime() + '.mp3'//path.resolve('./audios/speech' + now.getTime() + '.mp3');
-    //const filePath = crypto.randomUUID() + '-' + file.name
+
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
     }
@@ -24,18 +24,20 @@ export default async function handler(
       
       const buffer = Buffer.from(await response.arrayBuffer());
       
-      //console.log(`Streaming response to ${speechFile}`);
-      //await fs.promises.writeFile(speechFile, buffer);
-      //console.log('Finished streaming');
-      
       const audioUrl = await uploadAudioFile(speechFile, buffer)
-           
+      
       if(!audioUrl){
         res.status(500).json({ error: 'Error uploading audio file' });
         return;
       }
+      const wordTimings = await createWordTimings(audioUrl)
 
-      res.status(200).json({ audioUrl });
+      if(!wordTimings){
+        res.status(500).json({ error: 'Error creating word timings' });
+        return;
+      }
+      
+      res.status(200).json({ audioUrl, wordTimings });
     } catch (error) {
       console.error('Error processing text:', error);
       res.status(500).json({ error: 'Error processing text' });
