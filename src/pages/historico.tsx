@@ -1,18 +1,17 @@
-import HistoryList from '@/components/HistoryList'
-import Layout from '@/components/Layout'
-import { useTextToAudio } from '@/hooks/useTextToAudio'
-import React from 'react'
+import HistoryList from "@/components/HistoryList";
+import Layout from "@/components/Layout";
+import { useTextToAudio } from "@/hooks/useTextToAudio";
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 const Historico = (props: Props) => {
-  const { history, handleDeleteFromHistory } = useTextToAudio()
-  return (
-    <Layout>
-      <HistoryList history={history} onDelete={handleDeleteFromHistory}/>
-    </Layout>
-      
-  )
-}
+	const { history, handleDeleteFromHistory } = useTextToAudio();
+	return (
+		<Layout>
+			<HistoryList history={history} onDelete={handleDeleteFromHistory} />
+		</Layout>
+	);
+};
 
-export default Historico
+export default Historico;
