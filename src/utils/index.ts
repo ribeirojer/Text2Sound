@@ -62,3 +62,53 @@ export async function extractTextFromEPUB(epubFilePath: string) {
 
 	return textContents;
 }
+
+async function extractImagesFromChapter(zip: JSZip, chapterPath: string) {
+	const chapterFile = zip.file(`OEBPS/${chapterPath}`);
+
+	if (!chapterFile) {
+		throw new Error(`Arquivo ${chapterPath} não encontrado`);
+	}
+
+	const content = await chapterFile.async("text");
+	const $ = cheerio.load(content);
+
+	const images = $("img").map((index, element) => $(element).attr("src")).get();
+	return images;
+}
+
+async function extractImageFiles(zip: JSZip, imagePaths: string[]) {
+	const images: { name: string, data: Buffer }[] = [];
+
+	for (const imagePath of imagePaths) {
+		const imageFile = zip.file(`OEBPS/${imagePath}`);
+		if (imageFile) {
+			const imageData = await imageFile.async("nodebuffer");
+			images.push({ name: imagePath, data: imageData });
+		}
+	}
+
+	return images;
+}
+
+export async function extractImagesFromEPUB(epubFilePath: string) {
+	const epubBuffer = readEPUBFile(epubFilePath);
+	const zip = await unzipEPUB(epubBuffer);
+	const chapters = await extractChapterOrder(zip);
+
+	const allImages: string[] = [];
+
+	for (const chapterPath of chapters) {
+		const images = await extractImagesFromChapter(zip, chapterPath);
+		allImages.push(...images);
+	}
+
+	const imageFiles = await extractImageFiles(zip, allImages);
+
+	// Opcional: Salvar as imagens em arquivos locais
+	for (const imageFile of imageFiles) {
+		fs.writeFileSync(`./output/${imageFile.name}`, imageFile.data);
+	}
+
+	return imageFiles;
+}
