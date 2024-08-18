@@ -4,6 +4,7 @@ export interface UploadResponse {
 	bookId: string;
 	fileUrl: string;
 	filename: string;
+	number_of_pages: number;
 }
 
 export interface UploadedBook {

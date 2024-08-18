@@ -61,6 +61,7 @@ export const useEpubUpload = () => {
 					bookId: result.bookId,
 					fileUrl: result.fileUrl,
 					filename: result.filename,
+					number_of_pages: result.number_of_pages,
 				},
 			]);
 		} catch (err) {
