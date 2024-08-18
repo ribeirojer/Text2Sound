@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import cheerio from "cheerio";
 import JSZip from "jszip";
+import https from "https";
 
 export function isValidKey(key: string): boolean {
 	// only allow s3 safe characters and characters which require special handling for now
@@ -25,6 +26,7 @@ async function extractChapterOrder(zip: JSZip) {
 
 	const tocContent = await tocFile.async("text");
 	const $ = cheerio.load(tocContent, { xmlMode: true });
+	console.log(tocContent);
 
 	const chapters: string[] = [];
 	$("navPoint").each((index, element) => {
@@ -50,15 +52,27 @@ async function extractChapterText(zip: JSZip, chapterPath: string) {
 }
 
 export async function extractTextFromEPUB(epubFilePath: string) {
-	const epubBuffer = readEPUBFile(epubFilePath);
-	const zip = await unzipEPUB(epubBuffer);
-	const chapters = await extractChapterOrder(zip);
+	const response: Buffer = await new Promise((resolve, reject) => {
+		https
+			.get(epubFilePath, (res) => {
+				const data: any[] = [];
+				res.on("data", (chunk) => data.push(chunk));
+				res.on("end", () => resolve(Buffer.concat(data)));
+			})
+			.on("error", reject);
+	});
 
 	const textContents = [];
+	const zip = await unzipEPUB(response);
+
+	const chapters = await extractChapterOrder(zip);
+	console.log(chapters);
+
 	for (const chapterPath of chapters) {
 		const text = await extractChapterText(zip, chapterPath);
 		textContents.push(text);
 	}
+	console.log(textContents);
 
 	return textContents;
 }
@@ -73,12 +87,14 @@ async function extractImagesFromChapter(zip: JSZip, chapterPath: string) {
 	const content = await chapterFile.async("text");
 	const $ = cheerio.load(content);
 
-	const images = $("img").map((index, element) => $(element).attr("src")).get();
+	const images = $("img")
+		.map((index, element) => $(element).attr("src"))
+		.get();
 	return images;
 }
 
 async function extractImageFiles(zip: JSZip, imagePaths: string[]) {
-	const images: { name: string, data: Buffer }[] = [];
+	const images: { name: string; data: Buffer }[] = [];
 
 	for (const imagePath of imagePaths) {
 		const imageFile = zip.file(`OEBPS/${imagePath}`);

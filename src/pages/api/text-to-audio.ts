@@ -31,7 +31,7 @@ export default async function handler(
 				res.status(500).json({ error: "Error uploading audio file" });
 				return;
 			}
-			const wordTimings = [{}]/*await createWordTimings(audioUrl);
+			const wordTimings = [{}]; /*await createWordTimings(audioUrl);
 
 			if (!wordTimings) {
 				res.status(500).json({ error: "Error creating word timings" });

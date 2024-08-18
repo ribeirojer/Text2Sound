@@ -89,7 +89,7 @@ export function useTextToAudio() {
 			setProgress(0);
 		}
 	};
-/** 
+	/** 
 	useEffect(() => {
 		if (audioRef.current && wordTimings.length > 0) {
 			const handleTimeUpdate = () => {

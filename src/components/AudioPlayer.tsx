@@ -40,14 +40,15 @@ const AudioPlayer = ({
 				<audio ref={audioRef} src={audioUrl} className="hidden" />
 
 				<div className="text-lg flex flex-wrap justify-center border border-[--zomp] rounded-lg p-4 mb-4">
-					{wordTimings && wordTimings.map((word, index) => (
-						<span
-							key={index}
-							className={`mx-1 ${index === currentWordIndex ? "bg-emerald-800 rounded" : ""}`}
-						>
-							{word.word}{" "}
-						</span>
-					))}
+					{wordTimings &&
+						wordTimings.map((word, index) => (
+							<span
+								key={index}
+								className={`mx-1 ${index === currentWordIndex ? "bg-emerald-800 rounded" : ""}`}
+							>
+								{word.word}{" "}
+							</span>
+						))}
 				</div>
 
 				<div className="flex space-x-4 mb-4">

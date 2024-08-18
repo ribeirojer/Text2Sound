@@ -1,4 +1,5 @@
 import { extractTextFromEPUB } from "@/utils";
+import { getFileById } from "@/utils/supabaseService";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -6,18 +7,15 @@ export default async function handler(
 	res: NextApiResponse,
 ) {
 	if (req.method === "POST") {
+		const { id } = req.body;
 		try {
-			// Exemplo de uso
-			extractTextFromEPUB("Nos Cumes do Desespero - Emil Cioran.epub")
-				.then((textContents) => {
-					textContents.forEach((text, index) => {
-						console.log(`Página ${index + 1}:`);
-						console.log(text);
-					});
-				})
-				.catch((err) => {
-					console.error("Erro ao extrair o texto:", err);
-				});
+			const epub = await getFileById(id);
+			const textContents = await extractTextFromEPUB(epub.public_url);
+
+			textContents.forEach((text, index) => {
+				console.log(`Página ${index + 1}:`);
+				console.log(text);
+			});
 
 			res.status(200).json({ audioUrl: "" });
 		} catch (error) {
