@@ -14,3 +14,17 @@ export async function getFileById(id: string) {
 
 	return data;
 }
+
+export async function saveAudioUrl(id: string, audioUrl: string) {
+	const { error } = await supabase
+		.from("pages")
+		.update({ audio_url: audioUrl })
+		.eq("id", id);
+
+	if (error) {
+		console.error("Erro ao salvar URL do áudio:", error);
+		return false;
+	}
+
+	return true;
+}

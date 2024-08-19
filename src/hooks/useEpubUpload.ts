@@ -45,7 +45,7 @@ export const useEpubUpload = () => {
 		formData.append("file", file);
 
 		try {
-			const response = await fetch("http://localhost:8000/upload", {
+			const response = await fetch(process.env.NEXT_PUBLIC_SERVER_API_URL + "/upload", {
 				method: "POST",
 				body: formData,
 			});

@@ -48,7 +48,7 @@ const EpubToAudio = () => {
 								uploading ? "cursor-not-allowed opacity-75" : ""
 							}`}
 						>
-							{uploading ? "Carregando..." : "Fazer Upload e Converter"}
+							{uploading ? "Carregando..." : "Fazer Upload"}
 						</button>
 						{uploading && <Loading message="Carregando, aguarde..." />}
 					</>

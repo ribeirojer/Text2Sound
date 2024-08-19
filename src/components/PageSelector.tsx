@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Loading from "@/components/Loading";
 import axios from "axios";
+import axiosClient from "@/utils/httpService";
 
 interface PageSelectorProps {
 	id: string;
@@ -9,14 +10,11 @@ interface PageSelectorProps {
 
 const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
 	const [currentPage, setCurrentPage] = useState(1);
-	const [selectedPageContent, setSelectedPageContent] = useState<string | null>(
-		null,
-	);
+	const [selectedPageContent, setSelectedPageContent] = useState<string>('');
+	const [pageId, setPageId] = useState<number>(0);
 	const [loadingPage, setLoadingPage] = useState(false);
 	const [pageError, setPageError] = useState<string>("");
-	const [audioUrl, setAudioUrl] = useState<string>(
-		"https://kdlazrlkixozkxxqtddm.supabase.co/storage/v1/object/public/text2audio/audios/speech1724003561668.mp3",
-	);
+	const [audioUrl, setAudioUrl] = useState<string>("");
 	const [loadingAudio, setLoadingAudio] = useState<boolean>(false);
 
 	const fetchPageContent = async (pageNumber: number) => {
@@ -24,25 +22,25 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
 
 		setLoadingPage(true);
 		setPageError("");
-		setSelectedPageContent(null);
+		setSelectedPageContent("");
+				setAudioUrl("");
 
 		try {
-			const response = await fetch("http://localhost:8000/get-page-content", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ id, pageNumber }),
-			});
+			const response = await axiosClient.post("/get-page-content", 
+				{ id, pageNumber 		});
 
-			if (!response.ok) {
+			if (!response.data) {
 				throw new Error("Erro ao buscar o conteúdo da página");
 			}
 
-			const result = await response.json();
-			const { content } = result;
+			const { page_id, content, audioUrl } = response.data;
 
 			setSelectedPageContent(content);
+            setPageId(page_id);
+			if(audioUrl.length){
+				setAudioUrl(audioUrl);
+			}
+
 		} catch (err) {
 			setPageError(`Erro ao buscar o conteúdo da página: ${err}`);
 		} finally {
@@ -75,11 +73,16 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
 			return;
 		}
 
+		if(audioUrl){
+			setPageError("Audio já disponível.");
+			return;
+		}
+
 		setLoadingAudio(true);
 		setPageError("");
 
 		try {
-			const response = await axios.post("/api/text-to-audio", { text });
+			const response = await axios.post("/api/text-to-audio", { text, id: pageId });
 			const { data } = response;
 			setAudioUrl(data.audioUrl);
 		} catch (error) {

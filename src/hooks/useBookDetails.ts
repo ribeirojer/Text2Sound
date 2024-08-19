@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { UploadedBook } from "@/interfaces";
+import axiosClient from "@/utils/httpService";
 
 const useBookDetails = (id: string | string[] | undefined) => {
 	const [book, setBook] = useState<UploadedBook | null>(null);

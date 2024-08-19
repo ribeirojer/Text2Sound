@@ -1,4 +1,5 @@
 import { convertTextToSpeech, createWordTimings } from "@/utils/createAudio";
+import { saveAudioUrl } from "@/utils/supabaseService";
 import { uploadAudioFile } from "@/utils/uploadAudioFile";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -7,7 +8,7 @@ export default async function handler(
 	res: NextApiResponse,
 ) {
 	if (req.method === "POST") {
-		const { text } = req.body;
+		const { text, id } = req.body;
 		const now = new Date();
 		const speechFile = `./audios/speech${now.getTime()}.mp3`; //path.resolve('./audios/speech' + now.getTime() + '.mp3');
 
@@ -30,6 +31,13 @@ export default async function handler(
 			if (!audioUrl) {
 				res.status(500).json({ error: "Error uploading audio file" });
 				return;
+			}
+			
+			if (id) {
+				await saveAudioUrl(
+					id,
+					audioUrl,
+				);
 			}
 			const wordTimings = [{}]; /*await createWordTimings(audioUrl);
 

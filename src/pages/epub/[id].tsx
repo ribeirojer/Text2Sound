@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import Loading from "@/components/Loading";
 import useBookDetails from "@/hooks/useBookDetails";
 import { useRouter } from "next/router";
-import BookOptions from "@/components/BookOptions";
 import PageSelector from "@/components/PageSelector";
+import axiosClient from "@/utils/httpService";
 
 const BookDetails: React.FC = () => {
 	const { id } = useRouter().query;
 	const { book, loading, error } = useBookDetails(id);
 	const [extracting, setExtracting] = useState(false);
+	const [isExtract, setIsExtract] = useState<boolean>(false);
 	const [extractError, setExtractError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (book?.is_extract_text !== undefined) {
+			setIsExtract(book.is_extract_text);
+		}
+	}, [book]);
 
 	const handleExtractText = async () => {
 		if (!id) return;
@@ -19,30 +26,26 @@ const BookDetails: React.FC = () => {
 		setExtractError(null);
 
 		try {
-			const response = await fetch("http://localhost:8000/extract-text", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ id }),
-			});
+			const response = await axiosClient.post("/extract-text", { id });
 
-			if (!response.ok) {
+			if (!response.data) {
 				throw new Error("Erro ao extrair texto");
 			}
 
-			const result = await response.json();
-			const { success, message, numberOfPages } = result;
+			const result = response.data;
+			const { success, message } = result;
 
 			if (!success) {
 				throw new Error(message);
 			}
+			setIsExtract(true);
 		} catch (err) {
 			setExtractError(`Erro ao extrair texto: ${err}`);
 		} finally {
 			setExtracting(false);
 		}
 	};
+
 	if (loading) {
 		return <Loading message="Carregando detalhes do livro..." />;
 	}
@@ -75,7 +78,7 @@ const BookDetails: React.FC = () => {
 				<h1 className="text-2xl font-bold mb-6">
 					{book.filename.split("-").slice(1).join(" ")}
 				</h1>
-				{book.is_extract_text ? (
+				{isExtract ? (
 					<PageSelector id={id as string} numberPages={book.number_of_pages} />
 				) : (
 					<button
@@ -85,6 +88,11 @@ const BookDetails: React.FC = () => {
 					>
 						{extracting ? "Extraindo..." : "Extrair Texto"}
 					</button>
+				)}
+				{extractError && (
+					<div className="text-red-600 mb-4">
+						{extractError}
+					</div>
 				)}
 				<a
 					href={book.fileUrl}
