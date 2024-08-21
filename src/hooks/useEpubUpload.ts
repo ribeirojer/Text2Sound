@@ -49,6 +49,7 @@ export const useEpubUpload = () => {
 				method: "POST",
 				body: formData,
 			});
+			console.log(response);
 
 			if (!response.ok) {
 				throw new Error("Erro no upload do arquivo.");

@@ -15,10 +15,10 @@ export async function getFileById(id: string) {
 	return data;
 }
 
-export async function saveAudioUrl(id: string, audioUrl: string) {
+export async function saveAudioUrl(id: string, audioUrls: string[]) {
 	const { error } = await supabase
 		.from("pages")
-		.update({ audio_url: audioUrl })
+		.update({ audio_urls: audioUrls })
 		.eq("id", id);
 
 	if (error) {
