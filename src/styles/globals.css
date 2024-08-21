@@ -57,3 +57,39 @@ body {
 .custom-audio-player button:hover {
   background-color: #ff6347;
 }
+
+
+.audio-player-container {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.audio-player-container button {
+  transition: background-color 0.3s ease;
+}
+
+.audio-player-container button:hover {
+  background-color: #333;
+}
+
+.audio-player-container input[type="range"] {
+  appearance: none;
+  background: #ddd;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.audio-player-container input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #333;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.audio-player-container input[type="range"]:hover::-webkit-slider-thumb {
+  background: #555;
+}
+

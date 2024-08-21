@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Loading from "@/components/Loading";
 import axios from "axios";
 import axiosClient from "@/utils/httpService";
+import EpubAudioPlayer from "./EpubAudioPlayer";
 
 interface PageSelectorProps {
   id: string;
@@ -16,9 +17,6 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
   const [pageError, setPageError] = useState<string>("");
   const [audioUrls, setAudioUrls] = useState<string[]>([]);
   const [loadingAudio, setLoadingAudio] = useState<boolean>(false);
-  const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const audioPlayerRef = useRef<HTMLAudioElement>(null);
 
   const fetchPageContent = async (pageNumber: number) => {
     if (!id) return;
@@ -98,43 +96,6 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
     fetchPageContent(currentPage);
   }, [currentPage]);
 
-  const handleAudioEnded = () => {
-    if (currentAudioIndex < audioUrls.length - 1) {
-      setCurrentAudioIndex((prevIndex) => prevIndex + 1);
-    } else {
-      setIsPlaying(false); // Para garantir que o botão mostre "Play" quando o último áudio terminar.
-    }
-  };
-
-  const handlePlayPause = () => {
-    if (audioPlayerRef.current) {
-      if (audioPlayerRef.current.paused) {
-        audioPlayerRef.current.play()
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((error) => {
-            console.error("Erro ao tentar reproduzir o áudio:", error);
-          });
-      } else {
-        audioPlayerRef.current.pause();
-        setIsPlaying(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.src = audioUrls[currentAudioIndex];
-    }
-  }, [currentAudioIndex, audioUrls]);
-
-  const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.volume = Number(event.target.value);
-    }
-  };
-
   return (
     <div className="my-4 p-4 border border-gray-300 rounded-md">
       <h3 className="text-lg font-semibold mb-2">
@@ -162,13 +123,14 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
       {loadingPage && <Loading message="Carregando conteúdo da página..." />}
       {pageError && <div className="text-red-600 mt-2">{pageError}</div>}
       {selectedPageContent && (
-        <div>
+        <div className="mb-4">
           <div>
             <h4 className="text-lg font-semibold mb-2">
               Conteúdo da página {currentPage}:
             </h4>
             <p>{selectedPageContent}</p>
           </div>
+      {audioUrls.length <= 0 && (
           <div className="mt-4">
             <button
               onClick={() => handleConvert(selectedPageContent)}
@@ -176,35 +138,11 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
             >
               Ouvir o conteúdo dessa página
             </button>
-          </div>
+          </div>)}
         </div>
       )}
       {loadingAudio && <Loading message="Convertendo texto em áudio..." />}
-      {audioUrls.length > 0 && (
-        <div className="mt-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handlePlayPause}
-              className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            >
-              {isPlaying ? "Pause" : "Play"}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              onChange={handleVolumeChange}
-              className="w-32"
-            />
-          </div>
-          <audio
-            ref={audioPlayerRef}
-            onEnded={handleAudioEnded}
-            style={{ display: "none" }}
-          />
-        </div>
-      )}
+      {audioUrls.length > 0 && <EpubAudioPlayer audioUrls={audioUrls} />}
     </div>
   );
 };
