@@ -13,7 +13,7 @@ export async function convertTextToSpeech(text: string) {
 	return response;
 }
 
-export async function createWordTimings(filePath: string) {
+export async function createWordTimings(filePath: string, granularities: "word" | "segment" = "segment") {
 	try {
 		// Baixar o arquivo remoto
 		const response = await axios.get(filePath, { responseType: "arraybuffer" });
@@ -29,7 +29,7 @@ export async function createWordTimings(filePath: string) {
 			file: fs.createReadStream(tempFilePath),
 			model: "whisper-1",
 			response_format: "verbose_json",
-			timestamp_granularities: ["word"],
+			timestamp_granularities: [granularities],
 		});
 
 		console.log(transcription);
