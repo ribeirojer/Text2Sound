@@ -27,6 +27,7 @@ const BookDetails: React.FC = () => {
 
 		try {
 			const response = await axiosClient.post("/extract-text", { id });
+			console.log(response);
 
 			if (!response.data) {
 				throw new Error("Erro ao extrair texto");

@@ -38,7 +38,7 @@ const Historico: React.FC = () => {
                       className="text-orange-500 hover:underline"
                       rel="noreferrer"
                     >
-                      Baixar Áudio
+                      Baixar {item.type !== "epub" ? "Áudio" : "EPUB"}
                     </a>
                     <button
                       onClick={() => removeEntry(index)}
