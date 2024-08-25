@@ -28,3 +28,14 @@ export async function saveAudioUrl(id: string, audioUrls: string[]) {
 
 	return true;
 }
+
+export async function getSinglePageByBookId(book_id: string, page_number: number) {
+    const { data, error } = await supabase.from("pages").select("id, content, audio_urls").eq("file_id", book_id).eq("page_number", page_number).single();
+
+    if (error) {
+        console.error("Erro ao buscar página:", error);
+        return null;
+    }
+
+    return data;
+}

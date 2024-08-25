@@ -90,6 +90,9 @@ const BookDetails: React.FC = () => {
 						{extracting ? "Extraindo..." : "Extrair Texto"}
 					</button>
 				)}
+				{extracting && (
+					<Loading message="Aguarde, estamos extraindo o texto..."></Loading>
+				)}
 				{extractError && (
 					<div className="text-red-600 mb-4">
 						{extractError}

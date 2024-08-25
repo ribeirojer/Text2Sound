@@ -27,13 +27,15 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
     setAudioUrls([]);
 
     try {
-      const response = await axiosClient.post("/get-page-content", { id, pageNumber });
+      const response = await fetch("/api/page-content",
+      { method: "POST", body: JSON.stringify({ id, pageNumber }) });
 
-      if (!response.data) {
+      if (!response.ok) {
         throw new Error("Erro ao buscar o conteúdo da página");
       }
+      const data = await response.json();
 
-      const { page_id, content, audioUrl: audioUrlsFromResponse } = response.data;
+      const { page_id, content, audioUrl: audioUrlsFromResponse } = data;
 
       setSelectedPageContent(content);
       setPageId(page_id);
@@ -41,6 +43,7 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
         setAudioUrls(audioUrlsFromResponse);
       }
     } catch (err) {
+      console.error(err);
       setPageError(`Erro ao buscar o conteúdo da página: ${err}`);
     } finally {
       setLoadingPage(false);
