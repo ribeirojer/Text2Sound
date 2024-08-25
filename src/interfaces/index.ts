@@ -10,7 +10,7 @@ export interface UploadResponse {
 export interface UploadedBook {
 	is_extract_text?: any;
 	bookId: string;
-	fileUrl: string;
+	public_url: string;
 	filename: string;
 	number_of_pages: number;
 }

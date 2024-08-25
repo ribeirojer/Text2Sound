@@ -2,6 +2,7 @@ import type { WordTiming } from "@/hooks/useTextToAudio";
 import type React from "react";
 
 type Props = {
+  text: string;
 	audioUrl: string;
 	wordTimings: WordTiming[];
 	currentWordIndex: number;
@@ -10,6 +11,7 @@ type Props = {
 };
 
 const AudioPlayer = ({
+  text,
 	audioUrl,
 	wordTimings,
 	currentWordIndex,
@@ -28,6 +30,7 @@ const AudioPlayer = ({
 		if (audioUrl) {
 			const a = document.createElement("a");
 			a.href = audioUrl;
+      a.target = "_blank";
 			a.download = "audio.mp3";
 			a.click();
 		}
@@ -38,9 +41,10 @@ const AudioPlayer = ({
 			<h2 className="text-2xl mb-4 font-semibold">Seu áudio está pronto:</h2>
 			<div className="custom-audio-player flex flex-col items-center mb-4">
 				<audio ref={audioRef} src={audioUrl} className="hidden" />
+        
 
 				<div className="text-lg flex flex-wrap justify-center border border-[--zomp] rounded-lg p-4 mb-4">
-					{wordTimings &&
+					{wordTimings ? 
 						wordTimings.map((word, index) => (
 							<span
 								key={index}
@@ -48,7 +52,7 @@ const AudioPlayer = ({
 							>
 								{word.word}{" "}
 							</span>
-						))}
+						)) : <p className="text-lg mb-4">{text}</p>}
 				</div>
 
 				<div className="flex space-x-4 mb-4">

@@ -1,5 +1,6 @@
+import { useHistoryContext } from "@/contexts/HistoryContext";
+import { type SetStateAction, useRef, useState } from "react";
 import axios from "axios";
-import { type SetStateAction, useEffect, useRef, useState } from "react";
 
 export interface ITextToAudioResponse {
 	audioUrl: string;
@@ -18,38 +19,11 @@ export function useTextToAudio() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [progress, setProgress] = useState(0);
-	const [history, setHistory] = useState<{ text: string; audioUrl: string }[]>(
-		[],
-	);
+	const { history, addEntry } = useHistoryContext();
 	const [wordTimings, setWordTimings] = useState<WordTiming[]>([]);
 	const [currentWordIndex, setCurrentWordIndex] = useState(-1);
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const resetCurrentWordIndex = () => setCurrentWordIndex(0);
-
-	useEffect(() => {
-		if (typeof window !== "undefined") {
-			const storedHistory = localStorage.getItem("conversionHistory");
-			if (storedHistory) {
-				setHistory(JSON.parse(storedHistory));
-			}
-		}
-	}, []);
-
-	const updateHistory = (newEntry: { text: string; audioUrl: any }) => {
-		const updatedHistory = [newEntry, ...history];
-		setHistory(updatedHistory);
-		if (typeof window !== "undefined") {
-			localStorage.setItem("conversionHistory", JSON.stringify(updatedHistory));
-		}
-	};
-
-	const handleDeleteFromHistory = (index: number) => {
-		const updatedHistory = history.filter((_, i) => i !== index);
-		setHistory(updatedHistory);
-		if (typeof window !== "undefined") {
-			localStorage.setItem("conversionHistory", JSON.stringify(updatedHistory));
-		}
-	};
 
 	const handleTextChange = (e: {
 		target: { value: SetStateAction<string> };
@@ -78,9 +52,10 @@ export function useTextToAudio() {
 		try {
 			const response = await axios.post("/api/text-to-audio", { text });
 			const data = response.data;
-			setAudioUrl(data.audioUrl);
+            console.log(data);
+			setAudioUrl(data.audioUrls[0]);
 			setWordTimings(data.wordTimings.words);
-			updateHistory({ text, audioUrl: data.audioUrl });
+			addEntry({ text, audioUrl: data.audioUrls[0], type: "text", timestamp: new Date().toISOString() })
 		} catch (error) {
 			console.error("Erro ao converter texto:", error);
 			setError("Falha ao converter o texto.");
@@ -133,6 +108,5 @@ export function useTextToAudio() {
 		handleTextChange,
 		handleConvert,
 		handleNewConversion,
-		handleDeleteFromHistory,
 	};
 }

@@ -54,6 +54,7 @@ const EpubToAudio = () => {
 					</>
 				)}
 				{error && <ErrorMessage message={error} />}
+				{uploading && <Loading message="Carregando, aguarde..." />}
 			</div>
 		</Layout>
 	);

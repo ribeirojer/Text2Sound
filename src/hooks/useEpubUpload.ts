@@ -1,3 +1,4 @@
+import { useHistoryContext } from "@/contexts/HistoryContext";
 import { UploadResponse, UploadedBook } from "@/interfaces";
 import { useState, useEffect } from "react";
 
@@ -7,6 +8,7 @@ export const useEpubUpload = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [uploadedBooks, setUploadedBooks] = useState<UploadedBook[]>([]);
 	const [showUploadForm, setShowUploadForm] = useState<boolean>(true);
+	const { addEntry } = useHistoryContext()
 
 	// Carregar os livros armazenados no localStorage quando o componente é montado
 	useEffect(() => {
@@ -60,11 +62,13 @@ export const useEpubUpload = () => {
 				...prev,
 				{
 					bookId: result.bookId,
-					fileUrl: result.fileUrl,
+					public_url: result.fileUrl,
 					filename: result.filename,
 					number_of_pages: result.number_of_pages,
 				},
 			]);
+			addEntry({ text: result.filename, audioUrl: result.fileUrl, type: "epub", timestamp: new Date().toISOString() })
+
 		} catch (err) {
 			setError(`Erro ao fazer upload do arquivo: ${err}`);
 		} finally {

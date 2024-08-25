@@ -46,6 +46,7 @@ const TextToAudio = (props: Props) => {
 			) : (
 				<div>
 					<AudioPlayer
+						text={text}
 						audioUrl={audioUrl}
 						audioRef={audioRef}
 						wordTimings={wordTimings}

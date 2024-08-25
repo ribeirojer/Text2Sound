@@ -40,7 +40,7 @@ const UploadedBookItem: React.FC<{
 					<span>Ouvir com texto sincronizado</span>
 				</Link>
 				<a
-					href={book.fileUrl}
+					href={book.public_url}
 					target="_blank"
 					className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors border border-blue-600 hover:bg-blue-100 px-2 py-1 rounded-md"
 					rel="noopener noreferrer"

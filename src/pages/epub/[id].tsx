@@ -95,7 +95,7 @@ const BookDetails: React.FC = () => {
 					</div>
 				)}
 				<a
-					href={book.fileUrl}
+					href={book.public_url}
 					target="_blank"
 					rel="noopener noreferrer"
 					className="w-full px-4 py-2 text-white bg-blue-600 rounded-md block text-center hover:bg-blue-700"
