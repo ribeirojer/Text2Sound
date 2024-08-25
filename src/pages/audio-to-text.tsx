@@ -34,7 +34,6 @@ const AudioToText = () => {
       addEntry({ text: filename, audioUrl: fileUrl, type: "audio", timestamp: new Date().toISOString() })
       setTranscriptionData(response.data);
       setIsLoading(false);
-      console.log("Transcrição de áudio:", response.data);
     } catch (error) {
       setIsLoading(false);
       console.error("Erro ao transcrever áudio:", error);
@@ -60,23 +59,7 @@ const AudioToText = () => {
           />
         )}
       </div>
-      <div className="flex justify-center mt-4">
-        <a
-          href="/"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Voltar
-        </a>
-      </div>
-      <div className="flex justify-center mt-4">
-        <a
-          href="/audio-to-text"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Novo Upload
-        </a>
-      </div>
-      {isLoading && <Loading />}
+      {isLoading && <Loading message="Extraindo texto do áudio..."/>}
     </Layout>
   );
 };

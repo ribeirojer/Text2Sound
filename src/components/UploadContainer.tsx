@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Loading from "./Loading";
 
 interface UploadContainerProps {
   onUploadSuccess: (fileUrl: string, filename: string) => void;
@@ -43,6 +44,7 @@ const UploadContainer: React.FC<UploadContainerProps> = ({ onUploadSuccess }) =>
         method: "POST",
         body: formData,
       });
+      console.log(response);
 
       if (!response.ok) {
         throw new Error("Erro no upload do arquivo.");
@@ -51,6 +53,7 @@ const UploadContainer: React.FC<UploadContainerProps> = ({ onUploadSuccess }) =>
       const result = await response.json();
       onUploadSuccess(result.fileUrl, result.filename);
     } catch (err) {
+      console.error(err);
       setError(`Erro ao fazer upload do arquivo: ${err}`);
     } finally {
       setUploading(false);
@@ -95,6 +98,7 @@ const UploadContainer: React.FC<UploadContainerProps> = ({ onUploadSuccess }) =>
         {uploading ? `Upload...` : "Fazer Upload e Transcrever"}
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
+      {uploading && <Loading message='Fazendo upload...' />}
     </div>
   );
 };
