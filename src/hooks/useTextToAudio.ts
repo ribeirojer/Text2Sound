@@ -53,9 +53,9 @@ export function useTextToAudio() {
 			const response = await axios.post("/api/text-to-audio", { text });
 			const data = response.data;
             console.log(data);
+			addEntry({ text, audioUrl: data.audioUrls[0], type: "text", timestamp: new Date().toISOString() })
 			setAudioUrl(data.audioUrls[0]);
 			setWordTimings(data.wordTimings.words);
-			addEntry({ text, audioUrl: data.audioUrls[0], type: "text", timestamp: new Date().toISOString() })
 		} catch (error) {
 			console.error("Erro ao converter texto:", error);
 			setError("Falha ao converter o texto.");

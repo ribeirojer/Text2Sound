@@ -1,4 +1,4 @@
-import { convertTextToSpeech, createWordTimings } from "@/utils/createAudio";
+import { convertTextToSpeech } from "@/utils/createAudio";
 import { saveAudioUrl } from "@/utils/supabaseService";
 import { uploadAudioFile } from "@/utils/uploadAudioFile";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -11,8 +11,6 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const { text, id } = req.body;
-    console.log(text);
-    console.log(id);
     const now = new Date();
 
     if (!text) {
@@ -20,7 +18,7 @@ export default async function handler(
     }
 
     try {
-      let audioUrls: string[] = [];
+      let audioUrlsWithIndex: { index: number; url: string }[] = [];
       let wordTimings: any[] = [];
 
       // Dividir o texto em parágrafos
@@ -42,34 +40,40 @@ export default async function handler(
 
       // Adiciona a última parte, se houver
       if (currentPart) textParts.push(currentPart);
-      
-      textParts.forEach(async (part, index) => {
+
+      const promises = textParts.map(async (part, index) => {
         const speechFile = `./audios/speech${now.getTime()}_${index}.mp3`;
-      
+
         const response = await convertTextToSpeech(part);
-      
+
         if (!response.ok) {
-          res.status(500).json({ error: "Error converting text to speech" });
-          return;
+          throw new Error("Error converting text to speech");
         }
-      
+
         const buffer = Buffer.from(await response.arrayBuffer());
         const audioUrl = await uploadAudioFile(speechFile, buffer);
-      
+
         if (!audioUrl) {
-          res.status(500).json({ error: "Error uploading audio file" });
-          return;
+          throw new Error("Error uploading audio file");
         }
-      
-        audioUrls.push(audioUrl);
-      
+
+        audioUrlsWithIndex.push({ index, url: audioUrl });
+
         /**
         const timings = await createWordTimings(audioUrl);
         if (timings) {
           wordTimings.push(...timings);
         } */
       });
-      
+
+      await Promise.all(promises);
+
+      // Ordenar as URLs dos áudios pelo índice
+      audioUrlsWithIndex.sort((a, b) => a.index - b.index);
+
+      // Extrair as URLs ordenadas
+      const audioUrls = audioUrlsWithIndex.map(item => item.url);
+
       if (id) {
         await saveAudioUrl(id, audioUrls);
       }

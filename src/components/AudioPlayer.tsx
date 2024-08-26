@@ -1,5 +1,6 @@
 import type { WordTiming } from "@/hooks/useTextToAudio";
 import type React from "react";
+import AudioWaveform from "./AudioWaveform";
 
 type Props = {
   text: string;
@@ -40,9 +41,8 @@ const AudioPlayer = ({
 		<div className="mt-6">
 			<h2 className="text-2xl mb-4 font-semibold">Seu áudio está pronto:</h2>
 			<div className="custom-audio-player flex flex-col items-center mb-4">
+				<AudioWaveform audioUrl={audioUrl} />
 				<audio ref={audioRef} src={audioUrl} className="hidden" />
-        
-
 				<div className="text-lg flex flex-wrap justify-center border border-[--zomp] rounded-lg p-4 mb-4">
 					{wordTimings ? 
 						wordTimings.map((word, index) => (
