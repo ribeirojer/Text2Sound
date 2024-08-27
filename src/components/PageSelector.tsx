@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import Loading from "@/components/Loading";
 import axios from "axios";
-import axiosClient from "@/utils/httpService";
 import EpubAudioPlayer from "./EpubAudioPlayer";
 
 interface PageSelectorProps {
   id: string;
+  epubId: string;
   numberPages: number;
 }
 
-const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
+const PageSelector: React.FC<PageSelectorProps> = ({ id, epubId, numberPages }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPageContent, setSelectedPageContent] = useState<string>("");
   const [pageId, setPageId] = useState<number>(0);
@@ -64,29 +64,46 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
     }
   };
 
+  const MAX_TEXT_LENGTH = 4096;
+  
   const handleConvert = async (text: string) => {
     if (!text.trim()) {
       setPageError("O texto não pode estar vazio.");
       return;
     }
-
+  
     if (text.length < 5) {
       setPageError("O texto deve ter pelo menos 5 caracteres.");
       return;
     }
-
+  
     if (audioUrls.length > 0) {
       setPageError("Áudio já disponível.");
       return;
     }
-
+  
     setLoadingAudio(true);
     setPageError("");
-
+  
+    // Dividindo o texto em duas partes
+    const firstPart = text.slice(0, MAX_TEXT_LENGTH);
+    const remainingPart = text.slice(MAX_TEXT_LENGTH);
+  
     try {
-      const response = await axios.post("/api/text-to-audio", { text, id: pageId });
-      const { data } = response;
-      setAudioUrls(data.audioUrls);
+      // Primeira requisição rápida com os primeiros 4096 caracteres
+      const quickResponse = await axios.post("/api/text-to-audio", { text: firstPart, id: pageId });
+      setAudioUrls(quickResponse.data.audioUrls);
+  
+      // Segunda requisição demorada com o restante do texto
+      if (remainingPart.length > 0) {
+        axios.post("/api/text-to-audio", { text: remainingPart, id: pageId })
+          .then(() => {
+            console.log("Requisição lenta completa.");
+          })
+          .catch((error) => {
+            console.error("Erro na requisição lenta:", error);
+          });
+      }
     } catch (error) {
       console.error("Erro ao converter texto:", error);
       setPageError("Falha ao converter o texto.");
@@ -94,7 +111,7 @@ const PageSelector: React.FC<PageSelectorProps> = ({ id, numberPages }) => {
       setLoadingAudio(false);
     }
   };
-
+  
   useEffect(() => {
     fetchPageContent(currentPage);
   }, [currentPage]);

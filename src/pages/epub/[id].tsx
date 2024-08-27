@@ -80,7 +80,7 @@ const BookDetails: React.FC = () => {
 					{book.filename.split("-").slice(1).join(" ")}
 				</h1>
 				{isExtract ? (
-					<PageSelector id={id as string} numberPages={book.number_of_pages} />
+					<PageSelector epubId={id as string} id={id as string} numberPages={book.number_of_pages} />
 				) : (
 					<button
 						onClick={handleExtractText}
