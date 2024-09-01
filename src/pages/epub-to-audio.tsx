@@ -34,6 +34,7 @@ const EpubToAudio = () => {
 						<button
 							onClick={startNewUpload}
 							className="w-full px-4 py-2 mt-4 rounded-md text-white bg-gradient-to-r from-[--zomp] to-[--yellow-green] hover:bg-orange-700"
+							data-testid="new-upload-button"
 						>
 							Novo Upload
 						</button>
@@ -47,6 +48,7 @@ const EpubToAudio = () => {
 							className={`w-full px-4 py-2 mt-4 rounded-md text-white bg-gradient-to-r from-[--zomp] to-[--yellow-green] hover:bg-orange-700 ${
 								uploading ? "cursor-not-allowed opacity-75" : ""
 							}`}
+							data-testid="upload-button"
 						>
 							{uploading ? "Carregando..." : "Fazer Upload"}
 						</button>

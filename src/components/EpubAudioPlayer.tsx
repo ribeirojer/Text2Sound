@@ -3,9 +3,10 @@ import { useAudioPlayer } from "@/hooks/useEpubAudioPlayer";
 
 interface AudioPlayerProps {
   audioUrls: string[];
+  dataTestId?: string;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrls }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrls, dataTestId }) => {
   const {
     audioRef,
     isPlaying,
@@ -16,7 +17,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrls }) => {
   } = useAudioPlayer(audioUrls);
 
   return (
-    <div className="audio-player-container p-4 bg-gray-100 rounded-md shadow-md">
+    <div className="audio-player-container p-4 bg-gray-100 rounded-md shadow-md" data-testid={dataTestId}>
       <audio ref={audioRef} />
       <div className="flex items-center space-x-4">
         <button

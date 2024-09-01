@@ -66,6 +66,10 @@ const Transcription: React.FC<TranscriptionProps> = ({ transcriptionData, audioU
           className={`px-4 py-2 font-semibold rounded-md text-white bg-gradient-to-r from-[--zomp] to-[--yellow-green] ${
             isPlaying ? "hover:bg-orange-700" : "hover:bg-blue-700"
           }`}
+          type="button"
+          aria-label={isPlaying ? "Pause" : "Play"}
+          title={isPlaying ? "Pause" : "Play"}
+          data-testid='play-pause-button'
         >
           {isPlaying ? "Pause" : "Play"}
         </button>

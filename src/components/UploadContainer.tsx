@@ -93,6 +93,10 @@ const UploadContainer: React.FC<UploadContainerProps> = ({ onUploadSuccess }) =>
       <button
         onClick={handleUpload}
         disabled={uploading}
+        type="button"
+        role="button"
+        aria-disabled={uploading}
+        data-testid="upload-button"
         className={`px-4 py-2 mt-4 rounded-md text-white bg-gradient-to-r from-[--zomp] to-[--yellow-green] hover:bg-orange-700 ${uploading ? "cursor-not-allowed" : ""}`}
       >
         {uploading ? `Upload...` : "Fazer Upload"}
