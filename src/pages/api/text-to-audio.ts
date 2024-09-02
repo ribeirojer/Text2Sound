@@ -5,6 +5,29 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 const MAX_TEXT_LENGTH = 4096;
 
+export function divideTextIntoParts(text: string): string[] {
+  const paragraphs = text.split(/\n+/);
+
+  let textParts: string[] = [];
+  let currentPart = "";
+
+  for (const paragraph of paragraphs) {
+    if ((currentPart + paragraph).length <= MAX_TEXT_LENGTH) {
+      // Adiciona o parágrafo atual à parte atual
+      currentPart += (currentPart ? "\n" : "") + paragraph;
+    } else {
+      // Adiciona a parte atual à lista de partes e inicia uma nova parte com o parágrafo atual
+      if (currentPart) textParts.push(currentPart);
+      currentPart = paragraph;
+    }
+  }
+
+  // Adiciona a última parte, se houver
+  if (currentPart) textParts.push(currentPart);
+
+  return textParts;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -21,25 +44,8 @@ export default async function handler(
       let audioUrlsWithIndex: { index: number; url: string }[] = [];
       let wordTimings: any[] = [];
 
-      // Dividir o texto em parágrafos
-      const paragraphs = text.split(/\n+/);
-
-      let textParts: string[] = [];
-      let currentPart = "";
-
-      for (const paragraph of paragraphs) {
-        if ((currentPart + paragraph).length <= MAX_TEXT_LENGTH) {
-          // Adiciona o parágrafo atual à parte atual
-          currentPart += (currentPart ? "\n" : "") + paragraph;
-        } else {
-          // Adiciona a parte atual à lista de partes e inicia uma nova parte com o parágrafo atual
-          if (currentPart) textParts.push(currentPart);
-          currentPart = paragraph;
-        }
-      }
-
-      // Adiciona a última parte, se houver
-      if (currentPart) textParts.push(currentPart);
+      // Dividir o texto em partes usando a função utilitária
+      const textParts = divideTextIntoParts(text);
 
       const promises = textParts.map(async (part, index) => {
         const speechFile = `./audios/speech${now.getTime()}_${index}.mp3`;

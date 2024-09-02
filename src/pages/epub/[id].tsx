@@ -7,7 +7,8 @@ import PageSelector from "@/components/PageSelector";
 import axiosClient from "@/utils/httpService";
 
 const BookDetails: React.FC = () => {
-	const { id } = useRouter().query;
+	const router = useRouter();// Force refresh the page
+	const { id } = router.query;
 	const { book, loading, error } = useBookDetails(id);
 	const [extracting, setExtracting] = useState(false);
 	const [isExtract, setIsExtract] = useState<boolean>(false);
@@ -40,6 +41,7 @@ const BookDetails: React.FC = () => {
 				throw new Error(message);
 			}
 			setIsExtract(true);
+            router.reload();
 		} catch (err) {
 			setExtractError(`Erro ao extrair texto: ${err}`);
 		} finally {
@@ -89,10 +91,8 @@ const BookDetails: React.FC = () => {
 				</h1>
 				{isExtract ? (
 					<PageSelector
-						epubId={id as string}
 						id={id as string}
 						numberPages={book.number_of_pages}
-						dataTestId="page-selector"
 					/>
 				) : (
 					<button
