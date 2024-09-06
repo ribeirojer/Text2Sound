@@ -43,6 +43,7 @@ const BookDetails: React.FC = () => {
 			setIsExtract(true);
             router.reload();
 		} catch (err) {
+			console.error(err);
 			setExtractError(`Erro ao extrair texto: ${err}`);
 		} finally {
 			setExtracting(false);
